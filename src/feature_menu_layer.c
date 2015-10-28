@@ -35,30 +35,12 @@ static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, ui
   // Determine which section we're working with
   switch (section_index) {
     case 0:
-      {
         // Draw title text in the section header
-#ifdef PBL_RECT
         menu_cell_basic_header_draw(ctx, cell_layer, "Some example items");
-#else
-        GSize size = layer_get_frame(cell_layer).size;
-        graphics_draw_text(ctx, "Some example items", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                           GRect(0, 0, size.w, size.h), GTextOverflowModeTrailingEllipsis, 
-                           GTextAlignmentCenter, NULL);
-#endif
-      }
       break;
     case 1:
-      {
         // Draw title text in the section header
-#ifdef PBL_RECT
         menu_cell_basic_header_draw(ctx, cell_layer, "One more");
-#else
-        GSize size = layer_get_frame(cell_layer).size;
-        graphics_draw_text(ctx, "One more", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                           GRect(0, 0, size.w, size.h), GTextOverflowModeTrailingEllipsis, 
-                           GTextAlignmentCenter, NULL);
-#endif
-      }
       break;
   }
 }
@@ -154,8 +136,8 @@ static void main_window_load(Window *window) {
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks){
     .get_num_sections = menu_get_num_sections_callback,
     .get_num_rows = menu_get_num_rows_callback,
-    .get_header_height = menu_get_header_height_callback,
-    .draw_header = menu_draw_header_callback,
+    .get_header_height = PBL_IF_RECT_ELSE(menu_get_header_height_callback, NULL),
+    .draw_header = PBL_IF_RECT_ELSE(menu_draw_header_callback, NULL),
     .draw_row = menu_draw_row_callback,
     .select_click = menu_select_callback,
     .get_cell_height = PBL_IF_ROUND_ELSE(get_cell_height_callback, NULL),
