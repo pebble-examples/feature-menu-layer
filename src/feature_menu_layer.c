@@ -35,11 +35,30 @@ static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, ui
   // Determine which section we're working with
   switch (section_index) {
     case 0:
-      // Draw title text in the section header
-      menu_cell_basic_header_draw(ctx, cell_layer, "Some example items");
+      {
+        // Draw title text in the section header
+#ifdef PBL_RECT
+        menu_cell_basic_header_draw(ctx, cell_layer, "Some example items");
+#else
+        GSize size = layer_get_frame(cell_layer).size;
+        graphics_draw_text(ctx, "Some example items", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+                           GRect(0, 0, size.w, size.h), GTextOverflowModeTrailingEllipsis, 
+                           GTextAlignmentCenter, NULL);
+#endif
+      }
       break;
     case 1:
-      menu_cell_basic_header_draw(ctx, cell_layer, "One more");
+      {
+        // Draw title text in the section header
+#ifdef PBL_RECT
+        menu_cell_basic_header_draw(ctx, cell_layer, "One more");
+#else
+        GSize size = layer_get_frame(cell_layer).size;
+        graphics_draw_text(ctx, "One more", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+                           GRect(0, 0, size.w, size.h), GTextOverflowModeTrailingEllipsis, 
+                           GTextAlignmentCenter, NULL);
+#endif
+      }
       break;
   }
 }
@@ -63,7 +82,8 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
             // Here we use the graphics context to draw something different
             // In this case, we show a strip of a watchface's background
             GSize size = layer_get_frame(cell_layer).size;
-            graphics_draw_bitmap_in_rect(ctx, s_background_bitmap, GRect(0, 0, size.w, size.h));
+            const uint8_t x_offset = (size.w - gbitmap_get_bounds(s_background_bitmap).size.w) / 2;
+            graphics_draw_bitmap_in_rect(ctx, s_background_bitmap, GRect(x_offset, 0, size.w, size.h));
           }
           break;
       }
@@ -71,8 +91,17 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
     case 1:
       switch (cell_index->row) {
         case 0:
+          {
           // There is title draw for something more simple than a basic menu item
+#ifdef PBL_RECT
           menu_cell_title_draw(ctx, cell_layer, "Final Item");
+#else
+          GSize size = layer_get_frame(cell_layer).size;
+          graphics_draw_text(ctx, "Final Item", fonts_get_system_font(FONT_KEY_GOTHIC_28),
+                             GRect(0, 0, size.w, size.h), GTextOverflowModeTrailingEllipsis, 
+                             GTextAlignmentCenter, NULL);
+#endif
+          }
           break;
       }
   }
@@ -89,8 +118,23 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
       layer_mark_dirty(menu_layer_get_layer(menu_layer));
       break;
   }
-
 }
+
+#ifdef PBL_ROUND 
+static int16_t get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context) { 
+  if (menu_layer_is_index_selected(menu_layer, cell_index)) {
+    switch (cell_index->row) {
+      case 0:
+        return MENU_CELL_ROUND_FOCUSED_SHORT_CELL_HEIGHT;
+        break;
+      default:
+        return MENU_CELL_ROUND_FOCUSED_TALL_CELL_HEIGHT;
+    }
+  } else {
+    return MENU_CELL_ROUND_UNFOCUSED_SHORT_CELL_HEIGHT;
+  }
+}
+#endif
 
 static void main_window_load(Window *window) {
   // Here we load the bitmap assets
@@ -114,6 +158,7 @@ static void main_window_load(Window *window) {
     .draw_header = menu_draw_header_callback,
     .draw_row = menu_draw_row_callback,
     .select_click = menu_select_callback,
+    .get_cell_height = PBL_IF_ROUND_ELSE(get_cell_height_callback, NULL),
   });
 
   // Bind the menu layer's click config provider to the window for interactivity
