@@ -12,22 +12,22 @@
   "resources": {
     "media": [
       {
-        "type": "png",
+        "type": "bitmap",
         "name": "IMAGE_MENU_ICON_BIG_WATCH",
         "file": "images/menu_icon_big_watch.png"
       },
       {
-        "type": "png",
+        "type": "bitmap",
         "name": "IMAGE_MENU_ICON_SECTOR_WATCH",
         "file": "images/menu_icon_sector_watch.png"
       },
       {
-        "type": "png",
+        "type": "bitmap",
         "name": "IMAGE_MENU_ICON_BINARY_WATCH",
         "file": "images/menu_icon_binary_watch.png"
       },
       {
-        "type": "png",
+        "type": "bitmap",
         "name": "IMAGE_BACKGROUND_BRAINS",
         "file": "images/brains_watch_background.png"
       }
